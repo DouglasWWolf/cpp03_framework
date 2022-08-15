@@ -127,7 +127,7 @@ protected:
     // The section name to look for specs in
     std::string m_current_section;
 
-    // Our configuration specs are a vector of spec_t objects
+    // Our configuration specs are a map of string vectors
     std::map<std::string, strvec_t> m_specs;
 };
 //----------------------------------------------------------------------------------------------------------
