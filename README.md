@@ -1,1 +1,2 @@
-# cpp03_framework
+# A C++ framework that is compilable under C++03
+ 
