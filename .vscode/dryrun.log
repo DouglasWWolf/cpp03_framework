@@ -1,0 +1,11 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/devel/cpp03_framework'
+for subdir in . foo bar baz; do \
+    mkdir -p -m 777 obj_x86/$subdir ;\
+done
+g++ -m64  -std=c++03 -O2 -g -Wall -Wno-write-strings -Wno-sign-compare -Wno-unused-result -Wno-strict-aliasing -fcommon -DLINUX  -c config_file.cpp -o obj_x86/config_file.o
+g++ -m64  -std=c++03 -O2 -g -Wall -Wno-write-strings -Wno-sign-compare -Wno-unused-result -Wno-strict-aliasing -fcommon -DLINUX  -c main.cpp -o obj_x86/main.o
+g++ -m64 -pthread -o ctest.x86 obj_x86/config_file.o obj_x86/main.o
+strip ctest.x86
+make: Leaving directory '/devel/cpp03_framework'
+ 
