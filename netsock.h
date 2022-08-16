@@ -61,6 +61,10 @@ public:
     // Call this to receive data from the socket
     int     receive(void* buffer, int length, bool peek = false);
 
+    // Call this to receive however many bytes are available for reading. Returns the
+    // the number of bytes received, or -1 if the socket was closed by the other side.
+    int     receive_noblock(void* buffer, int length);
+
     // Call this to fetch a line of text from the socket
     bool    getline(void* buffer, size_t buff_size);
 

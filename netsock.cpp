@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <signal.h>
+#include <errno.h>
 #include <netdb.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -413,6 +414,42 @@ int NetSock::receive(void* buffer, int length, bool peek)
     return length;
 }
 //==========================================================================================================
+
+
+//==========================================================================================================
+// receive_noblock() - Receives data from the socket, with a gaurantee to not block
+//
+// Passed:  buffer = Pointer to the place to store the received data
+//          length = The maximum number of bytes to receive
+//
+// Returns: The number of bytes that were read
+//             -- or -- -1 = The socket was closed by the peer
+//==========================================================================================================
+int NetSock::receive_noblock(void* buffer, int length)
+{
+    // Don't attempt to recv zero byutes
+    if (length == 0) return 0;
+
+    // Fetch as many bytes from the socket as we can
+    int bytes_rcvd = recv(m_sd, buffer, length, MSG_DONTWAIT);
+
+    // If we got an error indicator...
+    if (bytes_rcvd == -1)
+    {
+        // If the error was "no data available", tell the caller "no bytes received"
+        if (errno == EAGAIN || errno == EWOULDBLOCK) return 0;
+        
+        // Otherwise, a true error occured (i.e., the peer closed the socket)
+        close();
+        return -1;
+    }
+
+    // Tell the caller how many bytes were received
+    return bytes_rcvd;
+}
+//==========================================================================================================
+
+
 
 
 //==========================================================================================================
