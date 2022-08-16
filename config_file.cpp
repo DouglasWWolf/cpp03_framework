@@ -338,7 +338,6 @@ bool CConfigFile::lookup(string key, strvec_t *p_result)
     // An iterator to our specs-map
     map<string, strvec_t>::iterator it = m_specs.begin();
 
-
     // Convert the key to lower-case
     make_lower(key);
 
@@ -354,7 +353,7 @@ bool CConfigFile::lookup(string key, strvec_t *p_result)
         // If we have the specified key...
         if (it != m_specs.end())
         {
-            // If the caller wants the associate values, hand them to him
+            // If the caller wants the associated values, hand them to him
             if (p_result) *p_result = it->second;
         
             // Tell the caller that his key existed
@@ -387,7 +386,7 @@ bool CConfigFile::lookup(string key, strvec_t *p_result)
     }
 
     // If we get here, we couldn't find that key in our specs
-    if (p_result && m_throw_on_fail) throw runtime_error("config key '"+key+"' not found");
+    if (m_throw_on_fail) throw runtime_error("config key '"+key+"' not found");
 
     // Tell the caller that we couldn't find that key in our specs
     return false;
