@@ -11,6 +11,9 @@
 #include "serial_port.h"
 using std::string;
 
+// We're going to use this as a place to dump unused return values
+volatile int bitbucket;
+
 //============================================================================
 // Constructor() - Serial port begins in the 'closed' state
 //============================================================================
@@ -174,7 +177,7 @@ void CSerialPort::drain_input(int timeout_ms)
     char c;
 
     // Read in and throw away data until the line goes quiet for awhile
-    while (data_is_available(timeout_ms)) ::read(m_fd, &c, 1);
+    while (data_is_available(timeout_ms)) bitbucket = ::read(m_fd, &c, 1);
 }
 //============================================================================
 
@@ -274,7 +277,7 @@ int CSerialPort::get_char(int timeout_ms)
     if (!data_is_available(timeout_ms)) return -1;
 
     // Read a single character from the serial port
-    ::read(m_fd, &c, 1);
+    bitbucket = ::read(m_fd, &c, 1);
 
     // If we are supposed to display our output, do so
     if (m_sniff) ::printf("%c", c);
@@ -328,7 +331,7 @@ bool CSerialPort::read(void* buffer, int count, int timeout_ms)
 //============================================================================
 void CSerialPort::write(const void* buffer, int count)
 {
-    ::write(m_fd, buffer, count);
+    bitbucket = ::write(m_fd, buffer, count);
 
     // If we're sniffing...
     if (m_sniff)
