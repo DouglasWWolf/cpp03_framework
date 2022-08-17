@@ -9,7 +9,7 @@
 using namespace std;
 
 static double s_to_d(const string& s)  {return strtod(s.c_str(), NULL   );}
-static double s_to_i(const string& s)  {return strtol(s.c_str(), NULL, 0);}
+static int    s_to_i(const string& s)  {return strtol(s.c_str(), NULL, 0);}
 
 
 //==========================================================================================================
@@ -105,7 +105,6 @@ static string parse_to_delimeter(const char* in, char delimeter)
         // Append the character to the output string
         *out++ = c;
     }
-
 
     // nul-terminate the output string
     *out = 0;
@@ -321,19 +320,40 @@ void CConfigFile::dump_specs()
 //==========================================================================================================
 
 
+
 //==========================================================================================================
-// lookup() - Checks to see if a given key exists in our spec-map and optionally retrieves the values
+// lookup() - Like "exists()", but can throw a runtime_error exception if the key is not found
+//==========================================================================================================
+bool CConfigFile::lookup(string key, strvec_t *p_result)
+{
+    // Find out if this key exists
+    bool key_exists = exists(key, p_result);
+
+    // If it exists, we're done
+    if (key_exists) return true;
+
+    // If it doesn't exist and this should throw an error, do so
+    if (m_throw_on_fail) throw runtime_error("config key '"+key+"' not found");
+
+    // Otherwise, just report the failure via the return value
+    return false;
+}
+//==========================================================================================================
+
+
+
+//==========================================================================================================
+// exists() - Checks to see if a given key exists in our spec-map and optionally retrieves the values
 //
 // Passed: key      = Key to look up.   Can optionally be fully scoped
 //         p_result = A pointer to the strvec where the specified key's values should be stored
 //
-// On Entry: m_throw = 'true' if key-not-found error should throw an exception
+// Returns: true if that key exists in our map, otherwise false
 //
-// Returns: true if that key exists in our map
-//
-// If key doesn't exist in our map, this either returns false, or throws a std::runtime_error
+// This routine will never throw an exception.   If you need a version that throws an exception when
+// the key isn't found, try "lookup"
 //==========================================================================================================
-bool CConfigFile::lookup(string key, strvec_t *p_result)
+bool CConfigFile::exists(string key, strvec_t *p_result)
 {
     // An iterator to our specs-map
     map<string, strvec_t>::iterator it = m_specs.begin();
@@ -360,8 +380,7 @@ bool CConfigFile::lookup(string key, strvec_t *p_result)
             return true;
         }
 
-        // If we get here, the key wasn't found in our map
-        if (p_result && m_throw_on_fail) throw runtime_error("config key '"+key+"' not found");
+        // If we get here, the fully-scoped key wasn't found in our map
         return false;
     }
 
@@ -384,9 +403,6 @@ bool CConfigFile::lookup(string key, strvec_t *p_result)
         if (p_result) *p_result = it->second;
         return true;
     }
-
-    // If we get here, we couldn't find that key in our specs
-    if (m_throw_on_fail) throw runtime_error("config key '"+key+"' not found");
 
     // Tell the caller that we couldn't find that key in our specs
     return false;

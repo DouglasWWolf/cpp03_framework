@@ -108,7 +108,7 @@ public:
     bool    get(std::string, CConfigScript* p_script);
 
     // Tells the caller whether or not the specified spec-name exists
-    bool    exists(std::string key) {return lookup(key, NULL);}
+    bool    exists(std::string key) {return exists(key, NULL);}
 
     // Dumps out the m_specs in a human-readable form.  This is strictly for testing
     void    dump_specs();
@@ -121,8 +121,11 @@ protected:
     // A strvec_t is a vector of strings
     typedef std::vector< std::string > strvec_t;
 
-    // Call this to fetch the values-vector associated with a key
+    // Call this to fetch the values-vector associated with a key.  Can throw exception!
     bool    lookup(std::string key, strvec_t *p_result);
+
+    // Call this to fetch the values-vector associated with a key.  Won't throw excption
+    bool    exists(std::string, strvec_t *p_result);
 
     // The section name to look for specs in
     std::string m_current_section;
