@@ -244,7 +244,7 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
         // If this is the end of a script, save the list of lines into our specs
         if (*p == '}')
         {
-            if (in_script && !scoped_key_name.empty()) m_specs[scoped_key_name] = values;
+            if (in_script) m_specs[scoped_key_name] = values;
             in_script = false;
             continue;            
         }
