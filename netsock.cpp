@@ -222,11 +222,11 @@ void NetSock::listen(int concurrent_connections)
 // accept() - Waits for someone to connect to a server socket
 // 
 // Passed: timeout_ms = # of milliseconds to wait for incoming connection.  -1 = Wait forever
-//         new_sock   = The optional address of a new NetSock object to attach the connection to
+//         dest_sock  = The optional address of a destination NetSock object to attach the connection to
 //
 // Returns: true if a client connected to our server, otherwise false
 //==========================================================================================================
-bool NetSock::accept(int timeout_ms, NetSock* new_sock)
+bool NetSock::accept(int timeout_ms, NetSock* dest_sock)
 {
     // If the socket isn't created yet, don't even try 
     if (!m_is_created) throw runtime_error("accept called on non existent socket");
@@ -241,10 +241,10 @@ bool NetSock::accept(int timeout_ms, NetSock* new_sock)
     if (new_sd < 0) throw runtime_error("failure on accept()");
 
     // If the caller passed us a socket object to clone ourselves into...
-    if (new_sock)
+    if (dest_sock)
     {
-        *new_sock = *this;
-        new_sock->m_sd = new_sd;
+        *dest_sock = *this;
+        dest_sock->m_sd = new_sd;
     }
 
     // Otherwise, the new socket-descriptor is the one we'll read and write on
@@ -381,7 +381,7 @@ int NetSock::bytes_available()
 //==========================================================================================================
 int NetSock::receive(void* buffer, int length, bool peek)
 {
-    // Don't attempt to recv zero byutes
+    // Don't attempt to recv zero bytes
     if (length == 0) return 0;
 
     // This is the set of flags that we're going to pass to recv
@@ -427,7 +427,7 @@ int NetSock::receive(void* buffer, int length, bool peek)
 //==========================================================================================================
 int NetSock::receive_noblock(void* buffer, int length)
 {
-    // Don't attempt to recv zero byutes
+    // Don't attempt to recv zero bytes
     if (length == 0) return 0;
 
     // Fetch as many bytes from the socket as we can
