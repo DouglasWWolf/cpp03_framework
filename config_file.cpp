@@ -27,7 +27,6 @@ static void make_lower(string& s)
 //==========================================================================================================
 
 
-
 //==========================================================================================================
 // parse_bool() - Returns true if the indicated string is a non-zero number or the string "true"
 //==========================================================================================================
@@ -356,7 +355,7 @@ bool CConfigFile::lookup(string key, strvec_t *p_result)
 bool CConfigFile::exists(string key, strvec_t *p_result)
 {
     // An iterator to our specs-map
-    map<string, strvec_t>::iterator it = m_specs.begin();
+    map<string, strvec_t>::iterator it;
 
     // Convert the key to lower-case
     make_lower(key);
@@ -479,30 +478,30 @@ bool CConfigFile::get(string key, string fmt, void* p1, void* p2, void* p3, void
 //
 // If key doesn't exist in our map, these either return false, or throw a std::runtime_error
 //==========================================================================================================
-bool CConfigFile::get(std::string key, int32_t* p1, int32_t* p2, int32_t* p3, int32_t* p4, int32_t* p5,
-                                       int32_t* p6, int32_t* p7, int32_t* p8, int32_t* p9)
+bool CConfigFile::get(string key, int32_t* p1, int32_t* p2, int32_t* p3, int32_t* p4, int32_t* p5,
+                                  int32_t* p6, int32_t* p7, int32_t* p8, int32_t* p9)
 {
     return get(key, "i", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 
 
-bool CConfigFile::get(std::string key, double* p1, double* p2, double* p3, double* p4, double* p5,
-                                       double* p6, double* p7, double* p8, double* p9)
+bool CConfigFile::get(string key, double* p1, double* p2, double* p3, double* p4, double* p5,
+                                  double* p6, double* p7, double* p8, double* p9)
 {
     return get(key, "f", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 
-bool CConfigFile::get(std::string key, string* p1, string* p2, string* p3, string* p4, string* p5,
-                                       string* p6, string* p7, string* p8, string* p9)
+bool CConfigFile::get(string key, string* p1, string* p2, string* p3, string* p4, string* p5,
+                                  string* p6, string* p7, string* p8, string* p9)
 {
     return get(key, "s", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
 
 
-bool CConfigFile::get(std::string key, bool* p1, bool* p2, bool* p3, bool* p4, bool* p5,
-                                       bool* p6, bool* p7, bool* p8, bool* p9)
+bool CConfigFile::get(string key, bool* p1, bool* p2, bool* p3, bool* p4, bool* p5,
+                                  bool* p6, bool* p7, bool* p8, bool* p9)
 {
     return get(key, "b", p1, p2, p3, p4, p5, p6, p7, p8, p9);
 }
@@ -515,7 +514,7 @@ bool CConfigFile::get(std::string key, bool* p1, bool* p2, bool* p3, bool* p4, b
 //
 // If key doesn't exist in our map, these either return false, or throw a std::runtime_error
 //==========================================================================================================
-bool CConfigFile::get(std::string key, std::vector<double> *p_result)
+bool CConfigFile::get(string key, vector<double> *p_result)
 {
     double      value;
     strvec_t    values;
@@ -543,7 +542,7 @@ bool CConfigFile::get(std::string key, std::vector<double> *p_result)
     return true;
 }
 
-bool CConfigFile::get(std::string key, std::vector<int32_t> *p_result)
+bool CConfigFile::get(string key, vector<int32_t> *p_result)
 {
     int32_t      value;
     strvec_t    values;
@@ -571,7 +570,7 @@ bool CConfigFile::get(std::string key, std::vector<int32_t> *p_result)
     return true;
 }
 
-bool CConfigFile::get(std::string key, std::vector<string> *p_result)
+bool CConfigFile::get(string key, vector<string> *p_result)
 {
     string      value;
     strvec_t    values;
@@ -599,7 +598,7 @@ bool CConfigFile::get(std::string key, std::vector<string> *p_result)
     return true;
 }
 
-bool CConfigFile::get(std::string key, std::vector<bool> *p_result)
+bool CConfigFile::get(string key, vector<bool> *p_result)
 {
     bool        value;
     strvec_t    values;
