@@ -4,6 +4,7 @@
 #pragma once
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <string>
 
 //==========================================================================================================
@@ -20,10 +21,10 @@ public:
     ~UDPSock() {close();}
 
     // Create a socket that we will send UDP packets on.
-    bool    create_sender(int port, std::string dest_ip = "broadcast");
+    bool    create_sender(int port, std::string dest = "broadcast", int family = AF_INET);
 
     // Create a socket that we will use to receive UDP packets
-    bool    create_server(int port);
+    bool    create_server(int port, std::string bind_to = "", int family = AF_UNSPEC);
 
     // Closes the socket
     void    close();
@@ -45,10 +46,7 @@ protected:
     // The file descriptor
     int         m_sd;
 
-    // Address that packet was received from
-    sockaddr_in m_from_addr;
-
     // Address that packet will go out to
-    sockaddr_in m_to_addr;
+	addrinfo 	m_target;
 };
 //==========================================================================================================

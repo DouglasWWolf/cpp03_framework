@@ -20,8 +20,6 @@ public:
         CANT_CONNECT
     };
 
-    // Fetch the IP address of the local machine. family should be AF_INET or AF_INET6
-    static std::string get_local_ip(std::string iface, int family = AF_INET);
 
     // Constructor and Destructor
     NetSock();
@@ -46,7 +44,7 @@ public:
     bool    listen_and_accept(int timeout_ms = -1);
 
     // Call this to connect to a server
-    bool    connect(std::string server_name, int port);
+    bool    connect(std::string server_name, int port, int family = AF_INET);
 
     // Call this to turn Nagle's algorithm on or off
     void    set_nagling(bool flag);
