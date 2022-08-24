@@ -20,6 +20,8 @@ public:
         CANT_CONNECT
     };
 
+    // Fetch the IP address of the local machine. family should be AF_INET or AF_INET6
+    static std::string get_local_ip(std::string iface, int family = AF_INET);
 
     // Constructor and Destructor
     NetSock();

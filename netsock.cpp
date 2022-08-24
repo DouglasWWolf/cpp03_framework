@@ -14,7 +14,9 @@
 #include <netinet/tcp.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include "netsock.h"
+
 using namespace std;
 
 //==========================================================================================================
@@ -599,4 +601,65 @@ int NetSock::get_error(string* p_str)
 //==========================================================================================================
 
 
+//==========================================================================================================
+// get_local_ip() - Fetches the IP address of the local machine
+//
+// Passed:  iface  = Name of the interface ("eth0", "eth1", etc)
+//          family = AF_INET or AF_INET6
+//
+// Returns: The IP address (in either IPv4 or IPv6 format), or "" if none could be found
+//==========================================================================================================
+string NetSock::get_local_ip(string iface, int family)
+{
+    struct ifaddrs *ifaddr, *ifa;
 
+    // This is the field that will get returned
+    char ip_address[64] = {0};
+
+    // Figure out how long the socket address structure is for this family
+    socklen_t socklen = (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
+
+    // Fetch the list of network interfaces
+    if (getifaddrs(&ifaddr) < 0) return "";
+
+    // Walk through the linked list of interface information entries
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        // Get a handy reference to this entry
+        ifaddrs& entry = *ifa;
+
+        // If this entry is for a different interface, skip it
+        if (entry.ifa_name != iface) continue;
+
+        // Get a convenient pointer to the IP address for this entry
+        sockaddr* addr = entry.ifa_addr;
+
+        // If there's no IP address for this entry, skip it
+        if (addr == NULL) continue;
+
+        // If this entry is for the wrong family, skip it
+        if (addr->sa_family != family) continue;
+
+        // Fetch the ASCII IP address for this entry
+        int rc = getnameinfo(addr, socklen, ip_address, sizeof(ip_address), NULL, 0, NI_NUMERICHOST);
+
+        // On the off chance that the call to getnameinfo() fails, skip this entry
+        if (rc != 0) continue;
+
+        // Is there a '%' in this IP address?
+        char* p = strchr(ip_address, '%');
+        
+        // If so, truncate the IP address at that '%' character
+        if (p) *p = 0;
+
+        // And we have our IP address
+        break;
+    }
+
+    // Free the linked-list that was allocated by getifaddrs()
+    freeifaddrs(ifaddr);
+
+    // Hand the resulting IP address to the caller
+    return ip_address;
+}
+//==========================================================================================================

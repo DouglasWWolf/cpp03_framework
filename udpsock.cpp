@@ -15,19 +15,19 @@ using namespace std;
 //==========================================================================================================
 bool UDPSock::create_sender(int port, string dest_ip)
 {
-	int broadcast = 1;
+    int broadcast = 1;
 
-	// If the socket is open, close it
-	close();
+    // If the socket is open, close it
+    close();
 
-	// Create the socket
+    // Create the socket
     m_sd = socket(AF_INET, SOCK_DGRAM, 0);
 
     // If that failed, tell the caller
     if (m_sd < 0) return false;
 
-	// Make sure the destination IP address is valid
-	if (dest_ip.empty()) dest_ip = "255.255.255.255";
+    // Make sure the destination IP address is valid
+    if (dest_ip.empty()) dest_ip = "255.255.255.255";
 
     // If we're broadcasting, set up the socket for broadcast
     if (dest_ip == "255.255.255.255" || dest_ip == "broadcast")
@@ -55,12 +55,12 @@ bool UDPSock::create_sender(int port, string dest_ip)
 //==========================================================================================================
 bool UDPSock::create_server(int port)
 {
-	sockaddr_in addr;
+    sockaddr_in addr;
 
-	// If the socket is open, close it
+    // If the socket is open, close it
     close();
     
-	// Create the socket
+    // Create the socket
     m_sd = socket(AF_INET, SOCK_DGRAM, 0);
 
     // If that failed, tell the caller
@@ -86,7 +86,7 @@ bool UDPSock::create_server(int port)
 //==========================================================================================================
 void UDPSock::send(const void* msg, int length)
 {
-	sendto(m_sd, msg, length, 0, (sockaddr *) &m_to_addr, sizeof(m_to_addr));
+    sendto(m_sd, msg, length, 0, (sockaddr *) &m_to_addr, sizeof(m_to_addr));
 }
 //==========================================================================================================
 
@@ -102,10 +102,10 @@ int UDPSock::receive(void* buffer, int buf_size, string* p_source)
     char peer_ip[INET6_ADDRSTRLEN];
 
     // We need this for the call to ::recvfrom
-	socklen_t addrlen = sizeof(m_from_addr);
+    socklen_t addrlen = sizeof(m_from_addr);
 
     // Wait for a UDP message to arrive, and stuff it into the caller's buffer
-	int byte_count = recvfrom(m_sd, buffer, buf_size, 0,(sockaddr*)&m_from_addr, &addrlen);
+    int byte_count = recvfrom(m_sd, buffer, buf_size, 0,(sockaddr*)&m_from_addr, &addrlen);
 
     // If there is room in the caller's buffer, as a convenience, put a nul-byte after the message
     if (byte_count < buf_size) ((char*)(buffer))[byte_count] = 0;
@@ -121,7 +121,7 @@ int UDPSock::receive(void* buffer, int buf_size, string* p_source)
     }
 
     // Return the length of the message that was just fetched
-	return byte_count;
+    return byte_count;
 }
 //==========================================================================================================
 
