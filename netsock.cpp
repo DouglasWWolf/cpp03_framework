@@ -236,10 +236,9 @@ bool NetSock::listen_and_accept(int timeout_ms)
 //==========================================================================================================
 // get_peer_address() - Returns the IP address of the other side of the connection
 //==========================================================================================================
-string NetSock::get_peer_address(int family)
+string NetSock::get_peer_address()
 {
-    sockaddr_in peer_addr;
-    char ip[INET6_ADDRSTRLEN];
+    sockaddr_storage peer_addr;
 
     // getpeername() will need to know the size of peer_addr
     socklen_t addr_size = sizeof(peer_addr);
@@ -247,11 +246,8 @@ string NetSock::get_peer_address(int family)
     // Fetch the IP address of the machine on the other side of the socket
     if (getpeername(m_sd, (sockaddr*)&peer_addr, &addr_size) < 0) return "unknown";
 
-    // Convert that address to a human-readable IP address
-    inet_ntop(family, &(peer_addr.sin_addr), ip, sizeof(ip));
-
-    // Hand the human-readable IP address of the connected client to the caller
-    return ip;
+    // Hand the caller the IP address    
+    return NetUtil::ip_to_string(peer_addr);
 }
 //==========================================================================================================
 

@@ -17,8 +17,11 @@ struct NetUtil
     // Fetch the IP address of the local machine. family should be AF_INET or AF_INET6
     static std::string get_local_ip(std::string iface, int family = AF_INET);
 
-    // Fetches the ASCII IP address from a sockaddr*.  (Works for IPv4 and IPv6)
+    // Fetches the ASCII IP address from a sockaddr*.  
     static std::string ip_to_string(sockaddr* addr);
+
+    // Converts a sockaddr_storage to an ASCII IP address.
+    static std::string ip_to_string(sockaddr_storage& ss);
 };
 
 

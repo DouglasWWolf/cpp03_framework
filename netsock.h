@@ -50,7 +50,7 @@ public:
     void    set_nagling(bool flag);
 
     // After an "accept()", call this to find the IP address of the client
-    std::string get_peer_address(int family = AF_INET);
+    std::string get_peer_address();
 
     // Waits for data to arrive.  Returns 'true' if data became available before the timeout expires
     bool    wait_for_data(int milliseconds);
