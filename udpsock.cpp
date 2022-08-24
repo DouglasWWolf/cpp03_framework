@@ -21,14 +21,17 @@ using namespace std;
 //==========================================================================================================
 bool UDPSock::create_sender(int port, string server, int family)
 {
-    int broadcast = 1;
+    int one = 1;
 
     // If the socket is open, close it
     close();
 
-    // Replace the word "broadcast" with an IP address
-    if (server == "broadcast") server = "255.255.255.255";
+    // Find out if we'll be broadcasting to all nodes
+    bool broadcast = (server == "broadcast");
 
+    // Determine the approprite broadcast address, based on the family
+    if (broadcast) server = (family == AF_INET) ? "255.255.255.255" : "FF02::1";
+    
     // Fetch information about the server we're trying to connect to
     if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &m_target)) return false;
 
@@ -39,9 +42,9 @@ bool UDPSock::create_sender(int port, string server, int family)
     if (m_sd < 0) return false;
 
     // If we're broadcasting, set up the socket for broadcast
-    if (server == "255.255.255.255")
+    if (broadcast)
     {
-        if (setsockopt(m_sd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof broadcast) == -1)
+        if (setsockopt(m_sd, SOL_SOCKET, SO_BROADCAST, &one, sizeof one) == -1)
         {
             return false;
         }
