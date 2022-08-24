@@ -243,11 +243,14 @@ string NetSock::get_peer_address()
     // getpeername() will need to know the size of peer_addr
     socklen_t addr_size = sizeof(peer_addr);
 
+    // Get a convenient pointer to the peer address
+    sockaddr* p_peer = (sockaddr*)&peer_addr;
+
     // Fetch the IP address of the machine on the other side of the socket
-    if (getpeername(m_sd, (sockaddr*)&peer_addr, &addr_size) < 0) return "unknown";
+    if (getpeername(m_sd, p_peer, &addr_size) < 0) return "unknown";
 
     // Hand the caller the IP address    
-    return NetUtil::ip_to_string(peer_addr);
+    return NetUtil::ip_to_string(p_peer);
 }
 //==========================================================================================================
 
