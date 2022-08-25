@@ -35,7 +35,7 @@ addrinfo NetUtil::get_local_addrinfo(int type, int port, string bind_to, int fam
     // Get an ASCII version of the port number
     sprintf(ascii_port, "%i", port);
 
-    // We're going to build an IPv4/IPv6 TCP socket
+    // Tell getaddrinfo about the socket family and type
     memset(&hints, 0, sizeof hints);
     hints.ai_family   = family;  
     hints.ai_socktype = type;
@@ -172,8 +172,6 @@ bool NetUtil::get_local_ip(string iface, int family, void* buffer, size_t bufsiz
     return inet_pton(family, ip.c_str(), buffer) > 1;
 }
 //==========================================================================================================
-
-
 
 
 
