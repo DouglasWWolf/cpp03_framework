@@ -4,7 +4,6 @@
 #pragma once
 #include <netinet/in.h>
 #include <string>
-#include <stdexcept>
 #include <netdb.h>
 
 struct NetUtil
