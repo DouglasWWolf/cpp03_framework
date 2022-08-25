@@ -1,18 +1,8 @@
 //==========================================================================================================
 // netutil.cpp - Implements some common networking utility functions
 //==========================================================================================================
-#include <unistd.h>
 #include <stdio.h>
-#include <stdarg.h>
 #include <string.h>
-#include <signal.h>
-#include <errno.h>
-#include <netdb.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/tcp.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <string>
@@ -69,7 +59,6 @@ addrinfo NetUtil::get_local_addrinfo(int type, int port, string bind_to, int fam
     return result;
 }
 //==========================================================================================================
-
 
 
 
@@ -162,6 +151,29 @@ string NetUtil::get_local_ip(string iface, int family)
     return ip_address;
 }
 //==========================================================================================================
+
+
+//==========================================================================================================
+// get_local_ip() - Fetches the local IP address in binary
+//==========================================================================================================
+bool NetUtil::get_local_ip(string iface, int family, void* buffer, size_t bufsize)
+{
+    // Ensure that the caller's buffer is big enough 
+    if (family == AF_INET  && bufsize < 4 ) return false;
+    if (family == AF_INET6 && bufsize < 16) return false;
+
+    // Fetch the local IP address as a string
+    string ip = get_local_ip(iface, family);
+
+    // If we couldn't fetch an IP address, tell the caller
+    if (ip.empty()) return false;
+
+    // Convert the ASCII IP address to binary, and tell the caller if it worked
+    return inet_pton(family, ip.c_str(), buffer) > 1;
+}
+//==========================================================================================================
+
+
 
 
 
