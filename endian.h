@@ -17,8 +17,8 @@ struct be_uint32_t
     be_uint32_t& operator=(uint32_t rhs) {set(rhs); return *this;}
 
     // Get and set the value
-    uint32_t get() {return (octet[0] <<24 | octet[1] << 16 | octet[2] <<8 | octet[3]);}
-    void     set(uint32_t v) {octet[0] = v>>24; octet[1] = v>>16; octet[2] = v>>8; octet[3] = v;}
+    uint32_t get() {return (octet[0] << 24 | octet[1] << 16 | octet[2] << 8 | octet[3]);}
+    void     set(uint32_t v) {octet[0] = v >> 24; octet[1] = v >> 16; octet[2] = v >> 8; octet[3] = v;}
 };
 
 
@@ -35,8 +35,8 @@ struct be_uint16_t
     be_uint16_t& operator=(uint16_t rhs) {set(rhs); return *this;}
 
     // Get and set the value
-    uint16_t get() {return (octet[0] <<8 | octet[1]);}
-    void     set(uint16_t v) {octet[0] = v>>8; octet[1] = v;}
+    uint16_t get() {return (octet[0] << 8 | octet[1]);}
+    void     set(uint16_t v) {octet[0] = v >> 8; octet[1] = v;}
 };
 
 
@@ -53,8 +53,8 @@ struct le_uint32_t
     le_uint32_t& operator=(uint32_t rhs) {set(rhs); return *this;}
 
     // Get and set the value
-    uint32_t get() {return (octet[3] <<24 | octet[2] << 16 | octet[1] <<8 | octet[0]);}
-    void     set(uint32_t v) {octet[3] = v>>24; octet[2] = v>>16; octet[1] = v>>8; octet[0] = v;}
+    uint32_t get() {return (octet[3] << 24 | octet[2] << 16 | octet[1] << 8 | octet[0]);}
+    void     set(uint32_t v) {octet[3] = v >> 24; octet[2] = v >> 16; octet[1] = v >> 8; octet[0] = v;}
 };
 
 
@@ -71,6 +71,6 @@ struct le_uint16_t
     le_uint16_t& operator=(uint16_t rhs) {set(rhs); return *this;}
 
     // Get and set the value
-    uint16_t get() {return (octet[1] <<8 | octet[0]);}
-    void     set(uint16_t v) {octet[1] = v>>8; octet[0] = v;}
+    uint16_t get() {return (octet[1] << 8 | octet[0]);}
+    void     set(uint16_t v) {octet[1] = v >> 8; octet[0] = v;}
 };

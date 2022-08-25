@@ -5,16 +5,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include <signal.h>
 #include <errno.h>
-#include <netdb.h>
 #include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/tcp.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <ifaddrs.h>
 #include "netsock.h"
 #include "netutil.h"
 using namespace std;
