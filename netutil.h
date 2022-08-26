@@ -25,6 +25,10 @@ struct NetUtil
 
     // Converts a sockaddr_storage to an ASCII IP address.
     static std::string ip_to_string(sockaddr_storage& ss);
+
+    // Call this to wait for data to arrive on anywhere from 1 to 4 descriptors
+    // timeout_ms of -1 means "wait forever"
+    static int wait_for_data(int timeout_ms, int fd1, int fd2 = -1, int fd3 = -1, int fd4 = -1);
 };
 
 

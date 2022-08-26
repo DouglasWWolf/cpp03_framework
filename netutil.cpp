@@ -214,3 +214,87 @@ std::string NetUtil::ip_to_string(sockaddr_storage& ss)
     return ip_to_string((sockaddr*)&ss);
 }
 //==========================================================================================================
+
+
+//==========================================================================================================
+// wait_for_data() - Waits for the specified amount of time for data to be available for reading
+//
+// Passed:  timeout_ms = timeout in milliseconds.  -1 = Wait forever
+//
+// Returns: a bitmap of which descriptors are available for reading
+//==========================================================================================================
+int NetUtil::wait_for_data(int timeout_ms, int fd1, int fd2, int fd3, int fd4)
+{
+    int    i, fd;
+    fd_set rfds;
+    timeval timeout;
+
+    // Put them into an array
+    int fd_list[] = {fd1, fd2, fd3, fd4};
+
+    // Find out how many items are in the array
+    const int ARRAY_COUNT = sizeof(fd_list) / sizeof(fd_list[0]);
+
+    // We don't know what the highest file descriptor is yet
+    int highest_fd = -1;
+
+    // Clear our file descriptor set
+    FD_ZERO(&rfds);
+
+    // Loop through each file descriptor that was provided by the caller...
+    for (i=0; i<ARRAY_COUNT; ++i)
+    {
+        // Fetch this file descriptor
+        fd = fd_list[i];
+
+        // Skip any invalid file descriptor
+        if (fd < 0) continue;   
+
+        // Include this file descriptor in our fd_set
+        FD_SET(fd, &rfds);
+
+        // Keep track of the highest file descriptor we have
+        if (fd > highest_fd) highest_fd = fd;
+    }
+
+    // Assume for the moment that we are going to wait forever
+    timeval* p_timeout = NULL;
+
+    // If the caller wants us to wait for a finite amount of time...
+    if (timeout_ms != -1)
+    {
+        // Convert milliseconds to microseconds
+        int usecs = timeout_ms * 1000;
+
+        // Determine the timeout in seconds and microseconds
+        timeout.tv_sec  = usecs / 1000000;
+        timeout.tv_usec = usecs % 1000000;
+
+        // Point to the timeout structure we just initialized
+        p_timeout = &timeout;
+    }
+
+    // Wait for one of the descriptors to become available for reading
+    if (select(highest_fd+1, &rfds, NULL, NULL, p_timeout) < 1) return 0;
+
+    // This is going to be a bitmap of which descriptors are readable
+    int result = 0;
+
+    // Loop through each possible descriptor...
+    for (i=0; i<ARRAY_COUNT; ++i)
+    {
+        // Fetch this file descriptor
+        fd = fd_list[i];
+
+        // Skip any invalid file descriptor
+        if (fd < 0) continue;   
+
+        // If this descriptor is readable, set the appropriate bit in the result
+        if (FD_ISSET(fd, &rfds)) result |= (1 << i);
+    }
+
+    // Hand the caller a bitmap of which of his descriptors are readable
+    return result;
+}
+//==========================================================================================================
+

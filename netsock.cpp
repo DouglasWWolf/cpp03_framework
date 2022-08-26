@@ -270,35 +270,7 @@ void NetSock::set_nagling(bool flag)
 //==========================================================================================================
 bool NetSock::wait_for_data(int timeout_ms)
 {
-    fd_set  rfds;
-    timeval timeout;
-
-    // Assume for the moment that we are going to wait forever
-    timeval* pTimeout = NULL;
-
-    // If the caller wants us to wait for a finite amount of time...
-    if (timeout_ms != -1)
-    {
-        // Convert milliseconds to microseconds
-        int usecs = timeout_ms * 1000;
-
-        // Determine the timeout in seconds and microseconds
-        timeout.tv_sec  = usecs / 1000000;
-        timeout.tv_usec = usecs % 1000000;
-
-        // Point to the timeout structure we just initialized
-        pTimeout = &timeout;
-    }
-
-    // We'll wait on input from the file descriptor
-    FD_ZERO(&rfds);
-    FD_SET(m_sd, &rfds);
-
-    // Wait for a character to be available for reading
-    int status = select(m_sd+1, &rfds, NULL, NULL, pTimeout);
-
-    // If status > 0, there is a character ready to be read
-    return (status > 0);
+    return NetUtil::wait_for_data(timeout_ms, m_sd);
 }
 //==========================================================================================================
 
