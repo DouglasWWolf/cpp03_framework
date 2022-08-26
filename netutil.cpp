@@ -116,7 +116,7 @@ string NetUtil::ip_to_string(sockaddr* addr)
     // Fetch the ASCII IP address for this entry
     int rc = getnameinfo(addr, socklen, ip_address, sizeof(ip_address), NULL, 0, NI_NUMERICHOST);
 
-    // On the off chance that the call to getnameinfo() fails, skip this entry
+    // On the off chance that the call to getnameinfo() fails, tell the caller
     if (rc != 0) return "";
 
     // Is there a '%' in this IP address?
