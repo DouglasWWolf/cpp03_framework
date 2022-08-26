@@ -364,6 +364,30 @@ int NetSock::receive(void* buffer, int length, bool peek)
 //==========================================================================================================
 
 
+
+
+//==========================================================================================================
+// receive_fragment() - Receives data from the socket
+//
+// Passed:  buffer = Pointer to the place to store the received data
+//          bufsize= The length of the buffer in bytes
+//
+// Returns: The number of bytes that were read
+//             -- or -- -1 to indicate the socket was closed by the peer
+//==========================================================================================================
+int NetSock::receive_fragment(void* buffer, size_t bufsize)
+{
+
+    // Fetch some bytes from the socket
+    int bytes_rcvd = recv(m_sd, buffer, bufsize, 0);
+
+    // Return either the number of bytes received, or -1 to signal "socket was closed"
+    return (bytes_rcvd < 1) ? -1 : bytes_rcvd;
+}
+//==========================================================================================================
+
+
+
 //==========================================================================================================
 // receive_noblock() - Receives data from the socket, with a gaurantee to not block
 //
