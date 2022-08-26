@@ -9,13 +9,15 @@
 struct ipv4_t
 {
     unsigned char octet[4];
-    std::string text();
+    std::string   text();
+    void          clear();
 };
 
 struct ipv6_t
 {
     unsigned char octet[16];
-    std::string text();
+    std::string   text();
+    void          clear();
 };
 
 struct NetUtil
