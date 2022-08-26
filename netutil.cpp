@@ -101,81 +101,6 @@ bool NetUtil::get_server_addrinfo(int type, string server, int port, int family,
 
 
 //==========================================================================================================
-// get_local_ip() - Fetches the IP address of the local machine
-//
-// Passed:  iface  = Name of the interface ("eth0", "eth1", etc)
-//          family = AF_INET or AF_INET6
-//
-// Returns: The IP address (in either IPv4 or IPv6 format), or "" if none could be found
-//==========================================================================================================
-string NetUtil::get_local_ip(string iface, int family)
-{
-    string ip_address;
-    struct ifaddrs *ifaddr, *ifa;
-
-    // Fetch the list of network interfaces
-    if (getifaddrs(&ifaddr) < 0) return "";
-
-    // Walk through the linked list of interface information entries
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        // Get a handy reference to this entry
-        ifaddrs& entry = *ifa;
-
-        // If this entry is for a different interface, skip it
-        if (entry.ifa_name != iface) continue;
-
-        // Get a convenient pointer to the IP address for this entry
-        sockaddr* addr = entry.ifa_addr;
-
-        // If there's no IP address for this entry, skip it
-        if (addr == NULL) continue;
-
-        // If this entry is for the wrong family, skip it
-        if (addr->sa_family != family) continue;
-
-        // Fetch the ASCII IP address for this entry
-        ip_address = ip_to_string(addr);
-
-        // On the off chance that the conversion to ASCII failed, skip this entry
-        if (ip_address.empty()) continue;
-
-        // And we have our IP address
-        break;
-    }
-
-    // Free the linked-list that was allocated by getifaddrs()
-    freeifaddrs(ifaddr);
-
-    // Hand the resulting IP address to the caller
-    return ip_address;
-}
-//==========================================================================================================
-
-
-//==========================================================================================================
-// get_local_ip() - Fetches the local IP address in binary
-//==========================================================================================================
-bool NetUtil::get_local_ip(string iface, int family, void* buffer, size_t bufsize)
-{
-    // Ensure that the caller's buffer is big enough 
-    if (family == AF_INET  && bufsize < 4 ) return false;
-    if (family == AF_INET6 && bufsize < 16) return false;
-
-    // Fetch the local IP address as a string
-    string ip = get_local_ip(iface, family);
-
-    // If we couldn't fetch an IP address, tell the caller
-    if (ip.empty()) return false;
-
-    // Convert the ASCII IP address to binary, and tell the caller if it worked
-    return inet_pton(family, ip.c_str(), buffer) > 1;
-}
-//==========================================================================================================
-
-
-
-//==========================================================================================================
 // ip_to_string() - Converts an IP address to a string
 //==========================================================================================================
 string NetUtil::ip_to_string(sockaddr* addr)
@@ -298,3 +223,128 @@ int NetUtil::wait_for_data(int timeout_ms, int fd1, int fd2, int fd3, int fd4)
 }
 //==========================================================================================================
 
+
+
+
+
+//==========================================================================================================
+// get_local_ip() - Fetches the IP address of the local machine
+//
+// Passed:  iface  = Name of the interface ("eth0", "eth1", etc)
+//          family = AF_INET or AF_INET6
+//          buffer = Pointer to the buffer where the binary address should end up
+//
+// Returns: True if an IP address was found, else false
+//==========================================================================================================
+static bool get_local_ip(string iface, int family, void* buffer)
+{
+    struct ifaddrs *ifaddr, *ifa;
+
+    // We haven't found an address yet
+    bool is_found = false;
+
+    // Find the address length in bytes
+    int addrlen = (family == AF_INET) ? 4 : 16;
+
+    // Clear the caller's buffer in case this call fails
+    memset(buffer, 0, addrlen);
+
+    // Fetch the list of network interfaces
+    if (getifaddrs(&ifaddr) < 0) return false;
+
+    // Walk through the linked list of interface information entries
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
+    {
+        // Get a handy reference to this entry
+        ifaddrs& entry = *ifa;
+
+        // If this entry is for a different interface, skip it
+        if (entry.ifa_name != iface) continue;
+
+        // Get a convenient pointer to the IP address for this entry
+        sockaddr* addr = entry.ifa_addr;
+
+        // If there's no IP address for this entry, skip it
+        if (addr == NULL) continue;
+
+        // If this entry is for the wrong family, skip it
+        if (addr->sa_family != family) continue;
+
+        // We've found our IP address
+        is_found = true;
+
+        // Copy the IP address into the caller's buffer
+        if (addr->sa_family == AF_INET)
+        {
+            sockaddr_in& in4 = *(sockaddr_in*)addr;
+            memcpy(buffer, &in4.sin_addr, 4);
+        }
+        else
+        {   sockaddr_in6& in6 = *(sockaddr_in6*)addr;
+            memcpy(buffer, &in6.sin6_addr, 16);
+        }
+
+        // And break out of the loop
+        break;
+    }
+
+    // Free the linked-list that was allocated by getifaddrs()
+    freeifaddrs(ifaddr);
+
+    // Tell the caller whether or not this worked
+    return is_found;
+}
+//==========================================================================================================
+
+
+
+//==========================================================================================================
+// get_local_ip() - Fetches the IP address of the local machine
+//
+// Passed:  iface  = Name of the interface ("eth0", "eth1", etc)
+//          dest   = A pointer to either an ipv4_t or an ipv6_t
+//
+// Returns: true if an IP address was retreived
+//==========================================================================================================
+bool NetUtil::get_local_ip(string iface, ipv4_t* dest)
+{
+    return ::get_local_ip(iface, AF_INET, dest);
+}
+
+bool NetUtil::get_local_ip(string iface, ipv6_t* dest)
+{
+    return ::get_local_ip(iface, AF_INET6, dest);
+}
+//==========================================================================================================
+
+
+//==========================================================================================================
+// text() - Returns the ASCII version of an IPv4 address
+//==========================================================================================================
+string ipv4_t::text()
+{
+    char buffer[64];
+    sprintf(buffer, "%d.%d.%d.%d", octet[0], octet[1], octet[2], octet[3]);
+    return buffer;
+}
+//==========================================================================================================
+
+
+//==========================================================================================================
+// text() - Returns the ASCII version of an IPv6 address
+//==========================================================================================================
+string ipv6_t::text()
+{
+    char buffer[64];
+    sprintf
+    (
+        buffer,
+        "%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
+         octet[ 0], octet[ 1], octet[ 2], octet[ 3],
+         octet[ 4], octet[ 5], octet[ 6], octet[ 7],
+         octet[ 8], octet[ 9], octet[10], octet[11],
+         octet[12], octet[13], octet[14], octet[15]
+    );
+    return buffer;         
+}
+//==========================================================================================================

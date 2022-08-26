@@ -6,13 +6,23 @@
 #include <string>
 #include <netdb.h>
 
+struct ipv4_t
+{
+    unsigned char octet[4];
+    std::string text();
+};
+
+struct ipv6_t
+{
+    unsigned char octet[16];
+    std::string text();
+};
+
 struct NetUtil
 {
-    // Fetch the ASCII IP address of the local machine. family should be AF_INET or AF_INET6
-    static std::string get_local_ip(std::string iface, int family = AF_INET);
-
-    // Fetch the binary IP address of the local machine. family should be AF_INET or AF_INET6
-    static bool get_local_ip(std::string iface, int family, void* buffer, size_t bufsize);
+    // These fetch a binary IP address for the local host
+    static bool get_local_ip(std::string iface, ipv4_t* dest);
+    static bool get_local_ip(std::string iface, ipv6_t* dest);
 
     // Returns addrinfo about the local machine
     static addrinfo get_local_addrinfo(int type, int port, std::string bind_to, int family);
