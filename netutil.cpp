@@ -243,12 +243,6 @@ static bool get_local_ip(string iface, int family, void* buffer)
     // We haven't found an address yet
     bool is_found = false;
 
-    // Find the address length in bytes
-    int addrlen = (family == AF_INET) ? 4 : 16;
-
-    // Clear the caller's buffer in case this call fails
-    memset(buffer, 0, addrlen);
-
     // Fetch the list of network interfaces
     if (getifaddrs(&ifaddr) < 0) return false;
 
@@ -305,15 +299,20 @@ static bool get_local_ip(string iface, int family, void* buffer)
 //          dest   = A pointer to either an ipv4_t or an ipv6_t
 //
 // Returns: true if an IP address was retreived
+//          If false is returned, the destination field is all zeros
 //==========================================================================================================
 bool NetUtil::get_local_ip(string iface, ipv4_t* dest)
 {
-    return ::get_local_ip(iface, AF_INET, dest);
+    if (::get_local_ip(iface, AF_INET, dest)) return true;
+    dest->clear();
+    return false;
 }
 
 bool NetUtil::get_local_ip(string iface, ipv6_t* dest)
 {
-    return ::get_local_ip(iface, AF_INET6, dest);
+    if (::get_local_ip(iface, AF_INET6, dest)) return true;
+    dest->clear();
+    return false;
 }
 //==========================================================================================================
 
@@ -348,3 +347,11 @@ string ipv6_t::text()
     return buffer;         
 }
 //==========================================================================================================
+
+//==========================================================================================================
+// Clear the ipv4_t and ipv6_t objects to all zeros
+//==========================================================================================================
+void ipv4_t::clear() {memset(octet, 0, sizeof(octet));}
+void ipv6_t::clear() {memset(octet, 0, sizeof(octet));}
+//==========================================================================================================
+
