@@ -240,6 +240,14 @@ static bool get_local_ip(string iface, int family, void* buffer)
 {
     struct ifaddrs *ifaddr, *ifa;
 
+    // Updating any one of these three variables updates all three of them
+    union
+    {
+        sockaddr     *addr;
+        sockaddr_in  *addr4;
+        sockaddr_in6 *addr6;
+    };
+    
     // We haven't found an address yet
     bool is_found = false;
 
@@ -256,7 +264,7 @@ static bool get_local_ip(string iface, int family, void* buffer)
         if (entry.ifa_name != iface) continue;
 
         // Get a convenient pointer to the IP address for this entry
-        sockaddr* addr = entry.ifa_addr;
+        addr = entry.ifa_addr;
 
         // If there's no IP address for this entry, skip it
         if (addr == NULL) continue;
@@ -268,15 +276,10 @@ static bool get_local_ip(string iface, int family, void* buffer)
         is_found = true;
 
         // Copy the IP address into the caller's buffer
-        if (addr->sa_family == AF_INET)
-        {
-            sockaddr_in& in4 = *(sockaddr_in*)addr;
-            memcpy(buffer, &in4.sin_addr, 4);
-        }
+        if (family == AF_INET)
+            memcpy(buffer, &addr4->sin_addr, 4);
         else
-        {   sockaddr_in6& in6 = *(sockaddr_in6*)addr;
-            memcpy(buffer, &in6.sin6_addr, 16);
-        }
+            memcpy(buffer, &addr6->sin6_addr, 16);
 
         // And break out of the loop
         break;
@@ -303,14 +306,20 @@ static bool get_local_ip(string iface, int family, void* buffer)
 //==========================================================================================================
 bool NetUtil::get_local_ip(string iface, ipv4_t* dest)
 {
+    // If we were able to fetch an IP address, tell the caller
     if (::get_local_ip(iface, AF_INET, dest)) return true;
+    
+    // Otherwise, clear the destination to zeros, and tell the caller
     dest->clear();
     return false;
 }
 
 bool NetUtil::get_local_ip(string iface, ipv6_t* dest)
 {
+    // If we were able to fetch an IP address, tell the caller
     if (::get_local_ip(iface, AF_INET6, dest)) return true;
+
+    // Otherwise, clear the destination to zeros, and tell the caller
     dest->clear();
     return false;
 }
