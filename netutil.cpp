@@ -378,7 +378,7 @@ void ipv6_t::clear() {memset(octet, 0, sizeof(octet));}
 //==========================================================================================================
 // from_ipv4() - Stores an IPv4 address into the first 4 bytes of an IPv6 object
 //==========================================================================================================
-void ipv6_t::from_ipv4(ipv4_t& rhs)
+void ipv6_t::from_ipv4(ipv4_t rhs)
 {
     clear();
     octet[0] = rhs.octet[0];
