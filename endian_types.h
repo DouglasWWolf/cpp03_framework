@@ -4,6 +4,40 @@
 #pragma once
 #include <inttypes.h>
 
+// Big endian 64-bit integer
+struct be_uint64_t
+{
+    // Storage
+    unsigned char octet[8];
+
+    // Cast to a uint64_t
+    operator uint64_t() {return get();}
+
+    // Assignment from a uint64_t
+    be_uint64_t& operator=(uint64_t rhs) {set(rhs); return *this;}
+
+    // Get the 64-bit value
+    uint64_t get()
+    {
+        uint64_t result = octet[0];
+        for (int i=1; i<8; ++i) result = (result << 8) | octet[i];
+        return result;        
+    }
+    
+    // Set the 64-bit value
+    void set(uint64_t v)
+    {
+        for (int i=7; i>=0; --i)
+        {
+            octet[i] = v;
+            v >>= 8;
+        }        
+    }
+
+};
+
+
+
 // Big endian 32-bit integer
 struct be_uint32_t
 {
