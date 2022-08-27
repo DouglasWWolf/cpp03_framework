@@ -8,17 +8,47 @@
 
 struct ipv4_t
 {
+    // Data
     unsigned char octet[4];
+    
+    // Conversion to IPv4 ASCII address
     std::string   text();
+    
+    // Clear the data to zeros
     void          clear();
 };
 
 struct ipv6_t
 {
+    // Data
     unsigned char octet[16];
+    
+    // Default constructor
+    ipv6_t() {};
+    
+    // Constructor from an ipv4_t
+    ipv6_t(ipv4_t& rhs) {from_ipv4(rhs);}
+    
+    // Assignment from an ipv4_t
+    ipv6_t& operator=(ipv4_t& rhs) {from_ipv4(rhs); return *this;}
+    
+    // Conversion to IPv6 ASCII address
     std::string   text();
+    
+    // Clear the data to zeros
     void          clear();
+    
+    // Conversion to IPv4 ASCII address
+    std::string   text4();
+    
+    // Assignment from an ipv4_t
+    void          from_ipv4(ipv4_t& rhs);
+    
+    // Test to see if this is potentially an IPv4 address
+    bool          is_ipv4();
 };
+
+
 
 struct NetUtil
 {
