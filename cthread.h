@@ -92,7 +92,7 @@ class CThread
 protected:
 
 	// This is the entry point to the thread when it starts
-	virtual void main() {};
+	virtual void main() = 0;
 
 	// Call this to terminate the thread
 	virtual void terminate();
