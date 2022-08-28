@@ -21,6 +21,9 @@ void* CThread::launch_cthread(void* object)
 	// Spin up "main()" in our new thread.  When this returns, the thread is done executing
 	((CThread*)object)->main();
 
+	// Give the derived class a chance to do cleanup prior to thread termination
+	((CThread*)object)->on_terminate();
+
 	// There's nothing to hand back to the caller
 	return NULL;
 }
@@ -49,6 +52,9 @@ int CThread::spawn(const void* P1, const void* P2, const void* P3)
 	m_spawn_param[1] = P2;
 	m_spawn_param[2] = P3;
 
+	// Give the derived class an opportunity to do stuff before we spin-up
+	on_spawn();
+
 	// Spin up the thread
 	int ret = pthread_create(&m_thread, NULL, launch_cthread, this);
 
@@ -73,6 +79,10 @@ void CThread::join()
 //==========================================================================================================
 void CThread::terminate()
 {
+	// Give the derived class an opportunity to do cleanup before we terminate
+	on_terminate();
+	
+	// Kill the thread
 	pthread_exit(NULL);
 }
 //==========================================================================================================

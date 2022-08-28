@@ -97,6 +97,12 @@ protected:
 	// Call this to terminate the thread
 	virtual void terminate();
 
+	// This gets called just prior to the thread terminating
+	virtual void on_terminate() {}
+
+	// This gets call just prior to the thread spawning
+	virtual void on_spawn() {}
+
 //----------------------------------------------------------------------------
 // These API's are for other threads to interface with this thread
 //----------------------------------------------------------------------------
