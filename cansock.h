@@ -44,7 +44,7 @@ public:
     // Closes the connection to the CAN interface
     void    close();
 
-    // Call this to place a message into the CAN bus
+    // Call this to place a message onto the CAN bus
     void    put(int msg_id, const void* buffer, size_t buf_size);
 
     // Call this to fetch the next message from the CAN bus.  Timeout of -1 means "wait forever"
