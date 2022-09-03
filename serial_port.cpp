@@ -12,7 +12,7 @@
 using std::string;
 
 // We're going to use this as a place to dump unused return values
-volatile int bitbucket;
+static volatile int bitbucket;
 
 //============================================================================
 // Constructor() - Serial port begins in the 'closed' state
