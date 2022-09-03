@@ -6,6 +6,28 @@
 #include <linux/can.h>
 #include <string>
 
+/*
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+  To use this on a machine that doesn't have a native CAN interface, you can create a virtual CAN interface
+  by running this script.  The virtual CAN interface created will exist until next reboot.
+
+  You should install can-utils (i.e., sudo apt install can-utils) so you can use the candump sniffer.
+
+  To use can-dump (after installing it), run "candump vcan0"
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+modprobe can
+modprobe can_raw
+modprobe vcan
+sudo ip link add dev vcan0 type vcan
+sudo ip link set up vcan0
+ip link show vcan0
+
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+*/
+
+
+
 class CANSock
 {
 public:
