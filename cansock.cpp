@@ -58,7 +58,7 @@ bool CANSock::connect(string interface)
 	addr.can_family  = AF_CAN;
 	addr.can_ifindex = ifr.ifr_ifindex;
 
-    // Bind our socket to this the index of this interface
+    // Bind our socket to the index of this interface
     if (bind(m_sd, &sa, sizeof(addr)) < 0) return false;
 
     // If we get here, we have a valid connection to the CAN interface
