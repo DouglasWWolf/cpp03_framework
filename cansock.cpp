@@ -98,7 +98,7 @@ bool CANSock::get(can_frame* p_frame, int timeout_ms)
     if (!NetUtil::wait_for_data(timeout_ms, m_sd)) return false;
 
     // Read the CAN frame from the interface
-    bit_bucket == read(m_sd, p_frame, sizeof(can_frame));
+    bit_bucket = read(m_sd, p_frame, sizeof(can_frame));
     
     // And tell the caller that his frame structure has a valid frame
     return true;
