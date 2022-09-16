@@ -5,12 +5,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include "config_file.h"
+#include "tokenizer.h"
 
 using namespace std;
 
 static double s_to_d(const string& s)  {return strtod(s.c_str(), NULL   );}
 static int    s_to_i(const string& s)  {return strtol(s.c_str(), NULL, 0);}
 
+static CTokenizer tokenizer;
 
 //==========================================================================================================
 // make_lower() - Converts a std::string to lower-case
@@ -63,22 +65,6 @@ static void decode(const string& s, bool    *p_result) {*p_result = parse_bool(s
 
 
 //==========================================================================================================
-// cleanup() - Given a line of text, this converts tabs to spaces and strips out CR and LF characters
-//==========================================================================================================
-static void cleanup(char* input)
-{
-    while (*input)
-    {
-        if (*input == '\t') *input = ' ';
-        if (*input == '\r') *input = 0;
-        if (*input == '\n') *input = 0;
-        ++input;
-    }
-}
-//==========================================================================================================
-
-
-//==========================================================================================================
 // parse_to_delimeter() - Returns a string of characters up to (but not including) a space or a delimeter
 //
 // Passed: in = Pointer the first character of the string
@@ -110,75 +96,6 @@ static string parse_to_delimeter(const char* in, char delimeter)
 
     // Hand the caller the token
     return token;
-}
-//==========================================================================================================
-
-
-//==========================================================================================================
-// parse_tokens() - Parses an input string into a vector of tokens
-//==========================================================================================================
-static vector<string> parse_tokens(const char* in)
-{
-    vector<string> result;
-    char           token[512];
-
-    // If we weren't given an input string, return an empty result;
-    if (in == NULL) return result;
-
-    // So long as there are input characters still to be processed...
-    while (*in)
-    {
-        // Point to the output buffer 
-        char* out = token;
-
-        // Skip over any leading spaces on the input
-        while (*in == ' ') in++;
-
-        // If we hit end-of-line, there are no more tokens to parse
-        if (*in == 0) break;
-
-        // Assume for the moment that we're not starting a quoted string
-        char in_quotes = 0;
-
-        // If this is a single or double quote-mark, remember it and skip past it
-        if (*in == '"' || *in == '\'') in_quotes = *in++;
-
-        // Loop until we've parsed this entire token...
-        while (*in)
-        {
-            // If we're parsing a quoted string...
-            if (in_quotes)
-            {
-                // If we've hit the ending quote-mark, we're done parsing this token
-                if (*in == in_quotes)
-                {
-                    ++in;
-                    break;
-                }
-            }
-
-            // Otherwise, we're not parsing a quoted string. A space or comma ends the token
-            else if (*in == ' ' || *in == ',') break;
-
-            // Append this character to the token buffer
-            *out++ = *in++;
-        }
-
-        // nul-terminate the token string
-        *out = 0;
-
-        // Add the token to our result list
-        result.push_back(token);
-
-        // Skip over any trailing spaces in the input
-        while (*in == ' ') ++in;
-
-        // If there is a trailing comma, throw it away
-        if (*in == ',') ++in;
-    }
-
-    // Hand the caller a vector of tokens
-    return result;
 }
 //==========================================================================================================
 
@@ -216,9 +133,6 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
     // Loop through every line of the input file...
     while (fgets(line, sizeof line, ifile))
     {
-        // Convert tabs to spaces and strip out end-of-line characters
-        cleanup(line);
-
         // Find the first non-space character in the line
         char* p = line;
         while (*p == ' ') ++p;
@@ -269,7 +183,7 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
         p = strchr(p, '=');
 
         // If it exists, parse the rest of the line after an '=' into a vector of string tokens    
-        if (p) values = parse_tokens(p+1);
+        if (p) values = tokenizer.parse(p+1);
 
         // Add this configuration spec to our master list of config specs
         m_specs[scoped_key_name] = values;
@@ -283,6 +197,7 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
     return true;
 }
 //==========================================================================================================
+
 
 
 //==========================================================================================================
@@ -683,7 +598,7 @@ bool CConfigScript::get_next_line(int *p_token_count, string *p_text)
     if (p_text) *p_text = m_script[m_line_index];
 
     // Parse this line into tokens
-    m_tokens = parse_tokens(m_script[m_line_index++].c_str());
+    m_tokens = tokenizer.parse(m_script[m_line_index++]);
 
     // If the caller wants to know how many tokens there are, fill in their field
     if (p_token_count) *p_token_count = m_tokens.size();
