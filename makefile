@@ -5,7 +5,7 @@ LIBNAME = libcpp03_framework
 
 #-----------------------------------------------------------------------------
 # This is a list of directories that have compilable code in them.  If there
-# are no subdirectories, this line is must SUBDIRS = .
+# are no subdirectories, this line must SUBDIRS = .
 #-----------------------------------------------------------------------------
 SUBDIRS = . 
 
@@ -51,11 +51,9 @@ ARM_PATH  = /opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl
 ARM_CC    = $(ARM_PATH)-gcc
 ARM_CXX   = $(ARM_PATH)-g++
 ARM_AR    = $(ARM_PATH)-ar
-ARM_STRIP = ${ARM_PATH}-strip
 X86_CC    = $(CC)
 X86_CXX   = $(CXX)
 X86_AR    = ar
-X86_STRIP = strip
 
 
 #-----------------------------------------------------------------------------
