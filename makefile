@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # This is the base name of the library	
 #-----------------------------------------------------------------------------
-LIBNAME = cpp03_framework
+LIBNAME = libcpp03_framework
 
 #-----------------------------------------------------------------------------
 # This is a list of directories that have compilable code in them.  If there
