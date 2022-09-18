@@ -133,7 +133,7 @@ $(X86_LIB) : $(X86_OBJS)
 
 
 #-----------------------------------------------------------------------------
-# This rule builds the ARM executable from the object files
+# This rule builds the ARM library from the object files 
 #-----------------------------------------------------------------------------
 $(ARM_LIB) : $(ARM_OBJS)
 	$(ARM_AR) crs $@ $(ARM_OBJS)
