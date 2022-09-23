@@ -472,6 +472,9 @@ int NetSock::send(const void* buffer, int length)
     // Don't attempt to send zero bytes
     if (length == 0) return 0;
 
+    // If the socket descriptor isn't open, don't try to send anything
+    if (m_sd < 0) return -1;
+
     // Get a byte pointer to the caller's buffer
     unsigned char* ptr = (unsigned char*)buffer;
 
