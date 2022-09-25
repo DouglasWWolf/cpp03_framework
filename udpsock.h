@@ -45,7 +45,7 @@ public:
 protected:
 
     // The file descriptor
-    int         m_sd;
+    int        m_sd;
 
     // The address IP address/port/etc of the UDP target
     sockaddr_t m_target;
