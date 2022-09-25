@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string>
+#include "netutil.h"
 
 //==========================================================================================================
 // UDPSock() - UDP socket for sending or receiving UDP datagrams
@@ -46,7 +47,7 @@ protected:
     // The file descriptor
     int         m_sd;
 
-    // Address that packet will go out to
-	addrinfo 	m_target;
+    // The address IP address/port/etc of the UDP target
+    sockaddr_t m_target;
 };
 //==========================================================================================================

@@ -14,6 +14,7 @@ using namespace std;
 bool UDPSock::create_sender(int port, string server, int family)
 {
     int one = 1;
+    addrinfo target;
 
     // If the socket is open, close it
     close();
@@ -25,10 +26,13 @@ bool UDPSock::create_sender(int port, string server, int family)
     if (broadcast) server = (family == AF_INET) ? "255.255.255.255" : "FF02::1";
     
     // Fetch information about the server we're trying to connect to
-    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &m_target)) return false;
+    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &target)) return false;
+
+    // Save the target address so we can use it later
+    m_target = target;
 
     // Create the socket
-    m_sd = socket(m_target.ai_family, m_target.ai_socktype, m_target.ai_protocol);
+    m_sd = socket(target.ai_family, target.ai_socktype, target.ai_protocol);
 
     // If that failed, tell the caller
     if (m_sd < 0) return false;
@@ -80,7 +84,7 @@ bool UDPSock::create_server(int port, string bind_to, int family)
 //==========================================================================================================
 void UDPSock::send(const void* msg, int length)
 {
-    sendto(m_sd, msg, length, 0, m_target.ai_addr, m_target.ai_addrlen);
+    sendto(m_sd, msg, length, 0, m_target, m_target.addrlen);
 }
 //==========================================================================================================
 

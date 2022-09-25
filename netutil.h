@@ -49,6 +49,15 @@ struct ipv6_t
 };
 
 
+// Extracts the sockaddr information from an addrinfo structure
+struct sockaddr_t
+{
+    sockaddr_t& operator=(addrinfo& rhs) {from_ai(rhs); return *this;}
+    operator sockaddr*() const {return (sockaddr*)&m_addr;}
+    void      from_ai(addrinfo& rhs);
+    sockaddr_storage m_addr;
+    socklen_t        addrlen;
+};
 
 struct NetUtil
 {
