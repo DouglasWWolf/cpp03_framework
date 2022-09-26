@@ -48,6 +48,6 @@ protected:
     int        m_sd;
 
     // The address IP address/port/etc of the UDP target
-    sockaddr_t m_target;
+    addrinfo_t m_target;
 };
 //==========================================================================================================

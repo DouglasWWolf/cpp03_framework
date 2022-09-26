@@ -18,13 +18,14 @@ using namespace std;
 //          bind_to = The IP address of the network card to bind to (optional)
 //          family  = AF_UNSPEC, AF_INET, or AF_INET6
 //
-// Returns: an addrinfo structure.
-//          if addrinfo.ai_family == 0, the call failed
+// Returns: an addrinfo_t structure.
+//          if addrinfo.family == 0, the call failed
 //==========================================================================================================
-addrinfo NetUtil::get_local_addrinfo(int type, int port, string bind_to, int family)
+addrinfo_t NetUtil::get_local_addrinfo(int type, int port, string bind_to, int family)
 {
     char ascii_port[20];
-    struct addrinfo hints, *p_res, result;
+    struct addrinfo hints, *p_res;
+    addrinfo_t result;
 
     // If we fail, our entire return structure will be zero
     memset(&result, 0, sizeof(result));
@@ -65,7 +66,7 @@ addrinfo NetUtil::get_local_addrinfo(int type, int port, string bind_to, int fam
 //==========================================================================================================
 // get_server_addrinfo() - Returns connection information for a remote server
 //==========================================================================================================
-bool NetUtil::get_server_addrinfo(int type, string server, int port, int family, addrinfo* p_result)
+bool NetUtil::get_server_addrinfo(int type, string server, int port, int family, addrinfo_t* p_result)
 {
     char ascii_port[20];
     struct addrinfo hints, *p_res;
@@ -405,14 +406,23 @@ bool ipv6_t::is_ipv4()
 
 
 //==========================================================================================================
-// from_ai() - Fill in a sockaddr_t structure from an addrinfo*
+// from_ai() - Fill in a addrinfo_t structure from a 'struct addrinfo'
 //==========================================================================================================
-void sockaddr_t::from_ai(addrinfo& ai)
+void addrinfo_t::from_ai(addrinfo& ai)
 {
     // Save the IP address, port, family, etc
-    m_addr = *(sockaddr_storage*)ai.ai_addr;
+    addr = *(sockaddr_storage*)ai.ai_addr;
 
     // Save the length of m_addr
     addrlen = ai.ai_addrlen;
+
+    // Save the address family (AF_INET or AF_INET6)
+    family = ai.ai_family;
+    
+    // Save the socket type (SOCK_DGRAM or SOCK_STREAM)
+    socktype = ai.ai_socktype;
+
+    // Save the protocol
+    protocol = ai.ai_protocol;
 }
 //==========================================================================================================

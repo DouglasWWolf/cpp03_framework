@@ -49,14 +49,17 @@ struct ipv6_t
 };
 
 
-// Extracts the sockaddr information from an addrinfo structure
-struct sockaddr_t
+// This is the equivalent of a 'struct addrinfo', but with no pointers
+struct addrinfo_t
 {
-    sockaddr_t& operator=(addrinfo& rhs) {from_ai(rhs); return *this;}
-    operator sockaddr*() const {return (sockaddr*)&m_addr;}
+    addrinfo_t& operator=(addrinfo& rhs) {from_ai(rhs); return *this;}
+    operator sockaddr*() const {return (sockaddr*)&addr;}
     void      from_ai(addrinfo& rhs);
-    sockaddr_storage m_addr;
+    sockaddr_storage addr;
     socklen_t        addrlen;
+    int              family;
+    int              socktype;
+    int              protocol;
 };
 
 struct NetUtil
@@ -66,10 +69,10 @@ struct NetUtil
     static bool get_local_ip(std::string iface, ipv6_t* dest);
 
     // Returns addrinfo about the local machine
-    static addrinfo get_local_addrinfo(int type, int port, std::string bind_to, int family);
+    static addrinfo_t get_local_addrinfo(int type, int port, std::string bind_to, int family);
 
     // Returns addrinfo about a remove server
-    static bool get_server_addrinfo(int type, std::string server, int port, int family, addrinfo* p_result);
+    static bool get_server_addrinfo(int type, std::string server, int port, int family, addrinfo_t* p_result);
 
     // Fetches the ASCII IP address from a sockaddr*.  
     static std::string ip_to_string(sockaddr* addr);

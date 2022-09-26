@@ -57,7 +57,7 @@ void NetSock::close()
 //==========================================================================================================
 bool NetSock::connect(std::string server, int port, int family)
 {
-    addrinfo info;
+    addrinfo_t info;
 
     // The socket is not yet created
     m_is_created = false;
@@ -74,13 +74,13 @@ bool NetSock::connect(std::string server, int port, int family)
     }
 
     // Create the socket
-    m_sd = socket(info.ai_family, info.ai_socktype, info.ai_protocol);
+    m_sd = socket(info.family, info.socktype, info.protocol);
 
     // If the socket() call fails, complain
     if (m_sd < 0) throw runtime_error("failure on socket()");
 
     // Attempt to connect to the server
-    if (::connect(m_sd, info.ai_addr, info.ai_addrlen) < 0)
+    if (::connect(m_sd, info, info.addrlen) < 0)
     {
         m_error_str = "can't connect to "+server;
         m_error     = CANT_CONNECT;
@@ -115,13 +115,13 @@ bool NetSock::create_server(int port, string bind_to, int family)
     close();
 
     // Fetch information about the server socket we're going to create
-    addrinfo server = NetUtil::get_local_addrinfo(SOCK_STREAM, port, bind_to, family);
+    addrinfo_t server = NetUtil::get_local_addrinfo(SOCK_STREAM, port, bind_to, family);
 
     // If that call to "get_local_info" failed, we throw an exception
-    if (server.ai_family == 0) throw runtime_error("failure on getaddrinfo()");
+    if (server.family == 0) throw runtime_error("failure on getaddrinfo()");
 
     // Create the socket
-    m_sd = socket(server.ai_family, server.ai_socktype, server.ai_protocol);
+    m_sd = socket(server.family, server.socktype, server.protocol);
 
     // If the socket() call fails, complain
     if (m_sd < 0) throw runtime_error("failure on socket()");
@@ -131,7 +131,7 @@ bool NetSock::create_server(int port, string bind_to, int family)
     setsockopt(m_sd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 
     // Bind it to the port we passed in to getaddrinfo():
-    if (bind(m_sd, server.ai_addr, server.ai_addrlen) < 0)
+    if (bind(m_sd, server, server.addrlen) < 0)
     {
         m_error_str = "failure on bind()";
         m_error     = BIND_FAILED;

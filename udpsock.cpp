@@ -14,7 +14,6 @@ using namespace std;
 bool UDPSock::create_sender(int port, string server, int family)
 {
     int one = 1;
-    addrinfo target;
 
     // If the socket is open, close it
     close();
@@ -26,13 +25,10 @@ bool UDPSock::create_sender(int port, string server, int family)
     if (broadcast) server = (family == AF_INET) ? "255.255.255.255" : "FF02::1";
     
     // Fetch information about the server we're trying to connect to
-    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &target)) return false;
-
-    // Save the target address so we can use it later
-    m_target = target;
+    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &m_target)) return false;
 
     // Create the socket
-    m_sd = socket(target.ai_family, target.ai_socktype, target.ai_protocol);
+    m_sd = socket(m_target.family, m_target.socktype, m_target.protocol);
 
     // If that failed, tell the caller
     if (m_sd < 0) return false;
@@ -61,16 +57,16 @@ bool UDPSock::create_server(int port, string bind_to, int family)
     close();
 
     // Fetch information about the local machine
-    addrinfo info = NetUtil::get_local_addrinfo(SOCK_DGRAM, port, bind_to, family);
+    addrinfo_t info = NetUtil::get_local_addrinfo(SOCK_DGRAM, port, bind_to, family);
 
     // Create the socket
-    m_sd = socket(info.ai_family, info.ai_socktype, info.ai_protocol);
+    m_sd = socket(info.family, info.socktype, info.protocol);
 
     // If that failed, tell the caller
     if (m_sd < 0) return false;
 
     // Bind the socket to the specified port
-    if (bind(m_sd, info.ai_addr, info.ai_addrlen) < 0) return false;
+    if (bind(m_sd, info, info.addrlen) < 0) return false;
 
     // Tell the caller that all is well
     return true;
