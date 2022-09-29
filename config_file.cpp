@@ -110,7 +110,7 @@ static string parse_to_delimeter(const char* in, char delimeter)
 //==========================================================================================================
 bool CConfigFile::read(string filename, bool msg_on_fail)
 {
-    char     line[1000];
+    char     line[1000], *p;
     strvec_t values;
     string   base_key_name, scoped_key_name;
     
@@ -133,8 +133,12 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
     // Loop through every line of the input file...
     while (fgets(line, sizeof line, ifile))
     {
+        // Chomp any end of line characters off the end of the line
+        p = strchr(line, 10); if (p) *p = 0;
+        p = strchr(line, 13); if (p) *p = 0;
+        
         // Find the first non-space character in the line
-        char* p = line;
+        p = line;
         while (*p == ' ') ++p;
 
         // If the line is blank or is a comment, ignore it
