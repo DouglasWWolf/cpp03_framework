@@ -107,6 +107,9 @@ public:
     // Call this to fetch a script-spec from the config file    
     bool    get(std::string, CConfigScript* p_script);
 
+    // Call this to fetch a script spec as a vector of string
+    bool    get_script_vector(std::string, std::vector<std::string>*);
+
     // Tells the caller whether or not the specified spec-name exists
     bool    exists(std::string key) {return exists(key, NULL);}
 

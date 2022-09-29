@@ -567,6 +567,32 @@ bool CConfigFile::get(string key, CConfigScript* p_script)
 //==========================================================================================================
 
 
+//==========================================================================================================
+// get_script_vector() - Fetches the script-spec that is associated with the specified key
+//
+// If key doesn't exist in our map, this either returns false, or throws a std::runtime_error
+//==========================================================================================================
+bool CConfigFile::get_script_vector(string key, vector<string>* p_script)
+{
+    strvec_t script_lines;
+
+    // Make the caller's script empty for the moment
+    p_script->clear();
+
+    // Fetch the values assocated with this key
+    if (!lookup(key, &script_lines)) return false;
+
+    // Fill in the caller's script
+    *p_script = script_lines;
+
+    // Tell the caller that all is well
+    return true;
+}
+//==========================================================================================================
+
+
+
+
 
 //==========================================================================================================
 // make_empty() - empties the script object of all data
