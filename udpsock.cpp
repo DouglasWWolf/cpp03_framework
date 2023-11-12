@@ -13,16 +13,34 @@ using namespace std;
 //==========================================================================================================
 bool UDPSock::create_sender(int port, string server, int family)
 {
+    // If the socket is open, close it
+    close();
+
+    // Fetch information about the server we're trying to connect to
+    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &m_target)) return false;
+
+    // Create the socket
+    m_sd = socket(m_target.family, m_target.socktype, m_target.protocol);
+
+    // If that failed, tell the caller
+    if (m_sd < 0) return false;
+
+    // Tell the caller that all is well
+    return true;
+}
+//==========================================================================================================
+
+
+
+//==========================================================================================================
+// create_broadcaster() - Create a socket useful for broadcasting UDP packets
+//==========================================================================================================
+bool UDPSock::create_broadcaster(int port, string server, int family)
+{
     int one = 1;
 
     // If the socket is open, close it
     close();
-
-    // Find out if we'll be broadcasting to all nodes
-    bool broadcast = (server == "broadcast");
-
-    // Determine the approprite broadcast address, based on the family
-    if (broadcast) server = (family == AF_INET) ? "255.255.255.255" : "FF02::1";
     
     // Fetch information about the server we're trying to connect to
     if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &m_target)) return false;
@@ -33,19 +51,19 @@ bool UDPSock::create_sender(int port, string server, int family)
     // If that failed, tell the caller
     if (m_sd < 0) return false;
 
-    // If we're broadcasting, set up the socket for broadcast
-    if (broadcast)
+    // Turn the socket to broadcast mode
+    if (setsockopt(m_sd, SOL_SOCKET, SO_BROADCAST, &one, sizeof one) == -1)
     {
-        if (setsockopt(m_sd, SOL_SOCKET, SO_BROADCAST, &one, sizeof one) == -1)
-        {
-            return false;
-        }
+        return false;
     }
 
     // Tell the caller that all is well
     return true;
 }
 //==========================================================================================================
+
+
+
 
 
 //==========================================================================================================
