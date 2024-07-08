@@ -25,7 +25,7 @@ public:
     bool    create_broadcaster(int port, std::string dest, int family = AF_INET);
 
     // Create a socket that we will send UDP packets on.
-    bool    create_sender(int port, std::string dest, int family = AF_INET);
+    bool    create_sender(int port, std::string dest, int family = AF_INET, int src_port = 0);
 
     // Create a socket that we will use to receive UDP packets
     bool    create_server(int port, std::string bind_to = "", int family = AF_UNSPEC);

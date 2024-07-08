@@ -11,19 +11,30 @@ using namespace std;
 //==========================================================================================================
 // create_sender() - Create a socket useful for sending UDP packets
 //==========================================================================================================
-bool UDPSock::create_sender(int port, string server, int family)
+bool UDPSock::create_sender(int dst_port, string server, int family, int src_port)
 {
     // If the socket is open, close it
     close();
 
     // Fetch information about the server we're trying to connect to
-    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, port, family, &m_target)) return false;
+    if (!NetUtil::get_server_addrinfo(SOCK_DGRAM, server, dst_port, family, &m_target)) return false;
 
     // Create the socket
     m_sd = socket(m_target.family, m_target.socktype, m_target.protocol);
 
     // If that failed, tell the caller
     if (m_sd < 0) return false;
+
+    // If the caller specified a source port...
+    if (src_port)
+    {
+        // Fetch information about the local machine
+        addrinfo_t info = NetUtil::get_local_addrinfo(SOCK_DGRAM, src_port, "", family);
+
+        // Bind the socket to the specified source port
+        if (bind(m_sd, info, info.addrlen) < 0) return false;
+
+    }
 
     // Tell the caller that all is well
     return true;
