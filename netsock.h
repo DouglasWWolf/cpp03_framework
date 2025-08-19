@@ -85,7 +85,7 @@ public:
     int     get_error(std::string* p_str = NULL);
 
     // Returns the socket descriptor
-    int     get_sd() {return m_sd;}
+    int     sd() {return m_sd;}
 
 protected:
 
