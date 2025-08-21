@@ -147,6 +147,10 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
         return false; 
     }       
 
+    // Clear any existing data
+    m_current_section = "";
+    m_specs.clear();
+
     // Loop through every line of the input file...
     while (fgets(line, sizeof line, ifile))
     {
